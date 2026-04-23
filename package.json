@@ -1,0 +1,17 @@
+{
+  "name": "devprotector",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "tauri": "cargo tauri",
+    "dev": "cargo tauri dev",
+    "build": "cargo tauri build",
+    "test:rust": "cd src-tauri && cargo test --test detection",
+    "test:e2e": "node tests/e2e.mjs",
+    "test": "bash scripts/run-all-tests.sh"
+  },
+  "devDependencies": {
+    "selenium-webdriver": "^4.27.0"
+  }
+}

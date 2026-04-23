@@ -1,0 +1,13 @@
+# Rust build artifacts
+/src-tauri/target
+/src-tauri/gen
+
+# Node
+/node_modules
+
+# Test harness
+/.test-logs
+
+# OS cruft
+.DS_Store
+*.swp
