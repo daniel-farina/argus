@@ -16,6 +16,15 @@ pub const BUNDLE_LINE_THRESHOLD: usize = 500;
 pub const SELF_EXCLUDE_MARKER: &str = "ARGUS_SELF_EXCLUDE";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ClaudeVerdict {
+    pub verdict: String, // "benign" | "suspicious" | "malicious" | "unknown"
+    pub confidence: String,
+    pub reasoning: String,
+    pub verified_at: String,
+    pub raw: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Detection {
     pub id: String,
     pub path: String,
@@ -25,6 +34,8 @@ pub struct Detection {
     pub hits: Vec<RuleHit>,
     pub timestamp: String,
     pub action: String,
+    #[serde(default)]
+    pub claude_verdict: Option<ClaudeVerdict>,
 }
 
 pub fn file_ext(path: &Path) -> String {
@@ -98,6 +109,13 @@ pub fn scan_file(path: &Path) -> anyhow::Result<Option<Detection>> {
     }
 
     let sha = sha256_of(path).unwrap_or_default();
+
+    // Filter out hits whose (sha, rule_id) fingerprint has been dismissed.
+    hits.retain(|h| !crate::dismissals::is_dismissed(&sha, &h.rule_id));
+    if hits.is_empty() {
+        return Ok(None);
+    }
+
     let top = top_severity(&hits);
 
     Ok(Some(Detection {
@@ -113,6 +131,7 @@ pub fn scan_file(path: &Path) -> anyhow::Result<Option<Detection>> {
         hits,
         timestamp: chrono::Utc::now().to_rfc3339(),
         action: "detected".to_string(),
+        claude_verdict: None,
     }))
 }
 

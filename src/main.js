@@ -161,6 +161,16 @@ function renderHit(h) {
     </div>`;
 }
 
+function verdictBadge(v) {
+  if (!v) return "";
+  const kind = (v.verdict || "unknown").toLowerCase();
+  const bucket = kind.startsWith("benign") ? "benign"
+    : kind.startsWith("malicious") ? "malicious"
+    : kind.startsWith("suspicious") ? "suspicious"
+    : "unknown";
+  return `<span class="badge verdict ${bucket}" title="${esc(v.reasoning || "")}">Claude: ${bucket} (${esc(v.confidence || "?")})</span>`;
+}
+
 function detectionItem(d, quarantined) {
   const isQ = quarantined.has(d.path) || (d.action || "").includes("quarantined");
   const hits = (d.hits || []).map(renderHit).join("");
@@ -173,15 +183,21 @@ function detectionItem(d, quarantined) {
   const claudeBtn = state.claudeAvailable
     ? `<button class="btn" data-action="ask-claude" data-line="${line}" data-rule="${esc(ruleId)}" data-title="${ruleTitle}">Ask Claude</button>`
     : "";
+  const triageBtn = state.claudeAvailable
+    ? `<button class="btn" data-action="auto-triage">Triage</button>`
+    : "";
   return `
-    <div class="item" data-testid="detection-row" data-path="${esc(d.path)}" data-line="${line}">
+    <div class="item" data-testid="detection-row" data-path="${esc(d.path)}" data-line="${line}" data-id="${esc(d.id)}">
       <div class="row">
         <div class="path">${esc(d.path)}</div>
         <div class="btn-row" style="margin-top:0">
           <span class="sev ${sevName(d.top_severity)}">${sevName(d.top_severity)}</span>
+          ${verdictBadge(d.claude_verdict)}
           <button class="btn" data-action="view" data-line="${line}">View source</button>
           <button class="btn" data-action="copy">Copy</button>
           ${claudeBtn}
+          ${triageBtn}
+          <button class="btn danger" data-action="dismiss" title="Mark as false positive - this file+rule won't re-alert">Dismiss FP</button>
           ${isQ
             ? `<span class="badge quarantined">quarantined</span>`
             : `<button class="btn danger" data-action="quarantine">Quarantine</button>
@@ -253,6 +269,38 @@ function wireDetectionActions(root) {
       const ruleId = btn.dataset.rule || "";
       const ruleTitle = btn.dataset.title || "";
       await openSourceModal(path, line, { askClaude: { ruleId, ruleTitle } });
+    };
+  });
+  root.querySelectorAll("[data-action=auto-triage]").forEach((btn) => {
+    btn.onclick = async () => {
+      const row = btn.closest(".item");
+      const id = row && row.dataset.id;
+      if (!id) return;
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "triaging...";
+      try {
+        await invoke("triage_detection_with_claude", { detectionId: id });
+      } catch (e) {
+        alert("Triage failed: " + e);
+      }
+      btn.disabled = false;
+      btn.textContent = orig;
+      await refresh();
+    };
+  });
+  root.querySelectorAll("[data-action=dismiss]").forEach((btn) => {
+    btn.onclick = async () => {
+      const row = btn.closest(".item");
+      const id = row && row.dataset.id;
+      if (!id) return;
+      const note = prompt("Reason (optional):") || null;
+      try {
+        await invoke("dismiss_detection", { detectionId: id, note, source: "user" });
+      } catch (e) {
+        alert("Dismiss failed: " + e);
+      }
+      await refresh();
     };
   });
 }
@@ -618,6 +666,41 @@ function renderBottombar() {
   else pulse.classList.add("idle");
 }
 
+function renderDismissals() {
+  const root = $("dismissList");
+  if (!root) return;
+  const list = state.dismissals || [];
+  $("dismissCount").textContent = list.length;
+  if (!list.length) {
+    root.innerHTML = `<div class="muted">Nothing dismissed yet.</div>`;
+    return;
+  }
+  root.innerHTML = list
+    .map(
+      (d) => `<div class="item">
+        <div class="row">
+          <div class="path">${esc(d.path)}</div>
+          <div class="btn-row" style="margin-top:0">
+            <span class="badge ${d.source === "claude" ? "verdict benign" : "quarantined"}">${esc(d.source)}</span>
+            <span class="rid">${esc(d.rule_id)}</span>
+            <button class="btn" data-action="undo-dismiss" data-sha="${esc(d.sha256)}" data-rule="${esc(d.rule_id)}">Undo</button>
+          </div>
+        </div>
+        <div class="meta">${esc(fmtTime(d.dismissed_at))} · sha256 ${esc(d.sha256.slice(0, 16))}${d.note ? " · " + esc(d.note) : ""}</div>
+      </div>`
+    )
+    .join("");
+  root.querySelectorAll("[data-action=undo-dismiss]").forEach((btn) => {
+    btn.onclick = async () => {
+      await invoke("undo_dismissal", {
+        sha256: btn.dataset.sha,
+        ruleId: btn.dataset.rule,
+      });
+      await refresh();
+    };
+  });
+}
+
 function renderSettings() {
   const sys = state.sys;
   const stats = state.stats || {};
@@ -629,6 +712,7 @@ function renderSettings() {
       ? "active blocking"
       : "detect only";
   mode.textContent = label;
+  renderDismissals();
 
   const meta = $("sysMeta");
   const rows = [];
@@ -672,6 +756,7 @@ async function refresh() {
   $("tglProtection").checked = s.protection_enabled;
   $("tglQuarantine").checked = s.auto_quarantine;
   $("tglKill").checked = s.auto_kill_processes;
+  if ($("tglClaude")) $("tglClaude").checked = !!s.auto_claude_triage;
   const mode = !s.protection_enabled ? "paused" :
     s.auto_quarantine || s.auto_kill_processes ? "active blocking" : "detect only";
   $("modePill").textContent = mode;
@@ -679,6 +764,7 @@ async function refresh() {
   state.quarantine = await invoke("list_quarantine");
   state.activity = await invoke("list_activity", { limit: 80 });
   state.stats = await invoke("get_activity_stats");
+  state.dismissals = await invoke("list_dismissals");
   renderAll();
 }
 
@@ -814,7 +900,9 @@ async function bootstrap() {
     ["tglProtection", "protectionEnabled"],
     ["tglQuarantine", "autoQuarantine"],
     ["tglKill", "autoKillProcesses"],
+    ["tglClaude", "autoClaudeTriage"],
   ]) {
+    if (!$(id)) continue;
     $(id).onchange = async (e) => {
       const p = {}; p[key] = e.target.checked;
       await invoke("set_protection", p);
@@ -831,6 +919,7 @@ async function bootstrap() {
   };
   await listen("argus://detection", scheduleRefresh);
   await listen("argus://quarantine", scheduleRefresh);
+  await listen("argus://claude-verdict", scheduleRefresh);
   await listen("argus://activity", (evt) => {
     if (evt && evt.payload) {
       state.activity = [evt.payload, ...state.activity].slice(0, 80);

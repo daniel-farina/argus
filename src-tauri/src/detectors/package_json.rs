@@ -91,24 +91,39 @@ fn classify_install_script(key: &str, cmd: &str) -> (Severity, Confidence, Strin
         );
     }
 
-    // Heuristics for known-benign install hooks.
+    // Heuristics for known-benign install hooks. Matched hooks get Info
+    // severity so they're dropped from the detection feed entirely - the
+    // classifier has recognised them as safe, no need to pester the user.
     let benign_tokens = [
         "husky", "is-ci", "patch-package", "node-gyp", "prebuild-install",
         "node-pre-gyp", "tsc", "npm run build", "node ./scripts",
-        "echo ", "simple-git-hooks", "lefthook install", "pnpm build",
+        "echo ", "echo \"", "echo '", ":", // "echo ...", no-op `:`
+        "simple-git-hooks", "lefthook install", "pnpm build",
         "only-allow", "safe-publish-latest", "npmignore", "not-in-publish",
         "pnpm install", "yarn install", "shx ", "del ", "del-cli",
         "rimraf ", "cross-env ", "mkdirp ", "nyc ", "tape ",
         "wireit", "turbo ", "turbo run", "lerna ", "nx ",
         "npm run postinstall --workspaces", "npm run prepare --workspaces",
         "workspaces --if-present",
+        // Build orchestrators that are clearly safe.
+        "webpack", "rollup", "vite", "esbuild", "parcel",
+        "publint", "attw", "biome", "tsup",
     ];
+    // Also: any command that's only an `echo` or a literal no-op `:`.
+    let trimmed = cmd.trim();
+    if trimmed == ":" || trimmed.starts_with("echo ") || trimmed == "echo" {
+        return (
+            Severity::Info,
+            Confidence::High,
+            format!("package.json {} is a no-op: {}", key, short(cmd)),
+        );
+    }
     for t in &benign_tokens {
         if low.contains(t) {
             return (
-                Severity::Low,
-                Confidence::Low,
-                format!("package.json {} runs benign tool ({}): {}", key, t, short(cmd)),
+                Severity::Info,
+                Confidence::High,
+                format!("package.json {} runs benign tool ({}): {}", key, t.trim(), short(cmd)),
             );
         }
     }

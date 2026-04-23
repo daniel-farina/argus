@@ -251,6 +251,12 @@ button{font-family:inherit}
 .badge.quarantined{background:var(--crit-soft);color:#fecaca;border-color:rgba(239,68,68,.3)}
 .badge.skipped{background:rgba(96,165,250,.1);color:#bfdbfe;border-color:rgba(96,165,250,.2)}
 .badge.new{background:rgba(96,165,250,.18);color:#93c5fd;border-color:rgba(96,165,250,.35)}
+.badge.verdict{letter-spacing:.5px;font-weight:600}
+.badge.verdict.benign{background:rgba(16,185,129,.14);color:#6ee7b7;border-color:rgba(16,185,129,.3)}
+.badge.verdict.suspicious{background:rgba(245,158,11,.14);color:#fde68a;border-color:rgba(245,158,11,.3)}
+.badge.verdict.malicious{background:rgba(239,68,68,.18);color:#fecaca;border-color:rgba(239,68,68,.35)}
+.badge.verdict.unknown{background:var(--panel-hi);color:var(--text-dim)}
+.badge.verdict.pending{background:rgba(125,125,255,.12);color:#c4b5fd;border-color:rgba(124,92,255,.3)}
 .toggle.tight{padding:0;margin:0;font-size:11px;color:var(--muted)}
 .toggle.tight input{width:12px;height:12px;margin-top:1px}
 .activity-list .t{color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px;margin-right:6px}

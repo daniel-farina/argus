@@ -9,6 +9,8 @@ pub struct Config {
     pub protection_enabled: bool,
     pub auto_kill_processes: bool,
     pub auto_quarantine: bool,
+    #[serde(default)]
+    pub auto_claude_triage: bool,
 }
 
 impl Config {
@@ -20,6 +22,7 @@ impl Config {
             protection_enabled: true,
             auto_kill_processes: false,
             auto_quarantine: false,
+            auto_claude_triage: false,
         }
     }
 }

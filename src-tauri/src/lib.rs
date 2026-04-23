@@ -1,5 +1,6 @@
 pub mod config;
 pub mod detectors;
+pub mod dismissals;
 pub mod processes;
 pub mod quarantine;
 pub mod rules;
@@ -27,6 +28,7 @@ struct Status {
     protection_enabled: bool,
     auto_kill_processes: bool,
     auto_quarantine: bool,
+    auto_claude_triage: bool,
     folders: Vec<String>,
     detections_total: usize,
     quarantine_total: usize,
@@ -39,6 +41,7 @@ fn get_status(state: SharedState<'_>) -> Status {
         protection_enabled: cfg.protection_enabled,
         auto_kill_processes: cfg.auto_kill_processes,
         auto_quarantine: cfg.auto_quarantine,
+        auto_claude_triage: cfg.auto_claude_triage,
         folders: cfg.folders.iter().cloned().collect(),
         detections_total: state.detections.lock().len(),
         quarantine_total: quarantine::list().len(),
@@ -50,6 +53,7 @@ fn set_protection(
     protection_enabled: Option<bool>,
     auto_kill_processes: Option<bool>,
     auto_quarantine: Option<bool>,
+    auto_claude_triage: Option<bool>,
     state: SharedState<'_>,
 ) {
     {
@@ -62,6 +66,9 @@ fn set_protection(
         }
         if let Some(v) = auto_quarantine {
             cfg.auto_quarantine = v;
+        }
+        if let Some(v) = auto_claude_triage {
+            cfg.auto_claude_triage = v;
         }
     }
     state.persist();
@@ -166,6 +173,7 @@ fn quarantine_path(
                 hits: vec![],
                 timestamp: chrono::Utc::now().to_rfc3339(),
                 action: "manual".into(),
+                claude_verdict: None,
             }
         });
     let entry = quarantine::quarantine(&det).map_err(|e| e.to_string())?;
@@ -422,6 +430,124 @@ async fn panic_pause() -> Result<(), String> {
     Ok(())
 }
 
+/// Parse the "VERDICT: ...\nCONFIDENCE: ...\nREASONING: ..." shape that
+/// analyze_with_claude asks Claude to emit. Falls back to raw text if it
+/// doesn't match.
+fn parse_claude_verdict(raw: &str) -> scanner::ClaudeVerdict {
+    let mut verdict = "unknown".to_string();
+    let mut confidence = "unknown".to_string();
+    let mut reasoning = String::new();
+    for line in raw.lines() {
+        let lower = line.trim().to_ascii_lowercase();
+        if let Some(v) = lower.strip_prefix("verdict:") {
+            verdict = v.trim().to_string();
+        } else if let Some(c) = lower.strip_prefix("confidence:") {
+            confidence = c.trim().to_string();
+        } else if let Some(r) = line.trim().strip_prefix("REASONING:") {
+            reasoning = r.trim().to_string();
+        } else if reasoning.is_empty() && !line.trim().is_empty() && !line.starts_with("VERDICT") && !line.starts_with("CONFIDENCE") {
+            // keep accumulating free-form text if the lines weren't labelled
+            if !reasoning.is_empty() {
+                reasoning.push('\n');
+            }
+            reasoning.push_str(line.trim());
+        }
+    }
+    scanner::ClaudeVerdict {
+        verdict,
+        confidence,
+        reasoning,
+        verified_at: chrono::Utc::now().to_rfc3339(),
+        raw: raw.to_string(),
+    }
+}
+
+#[tauri::command]
+async fn triage_detection_with_claude(
+    detection_id: String,
+    app: tauri::AppHandle,
+    state: SharedState<'_>,
+) -> Result<scanner::ClaudeVerdict, String> {
+    // Snapshot the detection we need to triage.
+    let det = {
+        let d = state.detections.lock();
+        d.iter().find(|x| x.id == detection_id).cloned()
+    };
+    let Some(det) = det else {
+        return Err("detection not found".into());
+    };
+    let first_hit = det.hits.first().cloned();
+    let (line, rule_id, rule_title) = match first_hit {
+        Some(h) => (h.line, h.rule_id, h.title),
+        None => (None, String::new(), String::new()),
+    };
+
+    let raw = analyze_with_claude(det.path.clone(), line, rule_id, rule_title).await?;
+    let verdict = parse_claude_verdict(&raw);
+
+    // Write back into the detections buffer.
+    {
+        let mut dets = state.detections.lock();
+        if let Some(d) = dets.iter_mut().find(|x| x.id == detection_id) {
+            d.claude_verdict = Some(verdict.clone());
+        }
+    }
+    let _ = app.emit(
+        "argus://claude-verdict",
+        serde_json::json!({
+            "detection_id": detection_id,
+            "verdict": verdict,
+        }),
+    );
+    Ok(verdict)
+}
+
+#[derive(Debug, Serialize)]
+struct DismissResult {
+    dismissed: Vec<dismissals::Dismissal>,
+}
+
+#[tauri::command]
+fn dismiss_detection(
+    detection_id: String,
+    note: Option<String>,
+    source: Option<String>,
+    state: SharedState<'_>,
+) -> Result<DismissResult, String> {
+    let snap = {
+        let d = state.detections.lock();
+        d.iter().find(|x| x.id == detection_id).cloned()
+    };
+    let Some(det) = snap else {
+        return Err("detection not found".into());
+    };
+    let src = source.unwrap_or_else(|| "user".into());
+    let mut out = Vec::new();
+    let rule_ids: std::collections::HashSet<String> =
+        det.hits.iter().map(|h| h.rule_id.clone()).collect();
+    for r in rule_ids {
+        let d = dismissals::add(&det.path, &det.sha256, &r, note.clone(), &src)
+            .map_err(|e| e.to_string())?;
+        out.push(d);
+    }
+    // Drop this detection from the live buffer too.
+    {
+        let mut dets = state.detections.lock();
+        dets.retain(|d| d.id != detection_id);
+    }
+    Ok(DismissResult { dismissed: out })
+}
+
+#[tauri::command]
+fn list_dismissals() -> Vec<dismissals::Dismissal> {
+    dismissals::list()
+}
+
+#[tauri::command]
+fn undo_dismissal(sha256: String, rule_id: String) -> Result<(), String> {
+    dismissals::remove(&sha256, &rule_id).map_err(|e| e.to_string())
+}
+
 #[tauri::command]
 async fn panic_resume() -> Result<(), String> {
     let shell = "pfctl -a argus -F all 2>/dev/null; echo ok";
@@ -537,6 +663,10 @@ pub fn run() {
             panic_status,
             panic_pause,
             panic_resume,
+            triage_detection_with_claude,
+            dismiss_detection,
+            list_dismissals,
+            undo_dismissal,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
