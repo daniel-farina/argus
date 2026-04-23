@@ -18,7 +18,7 @@ pub struct QuarantineEntry {
 
 pub fn quarantine_root() -> PathBuf {
     let base = dirs::home_dir().unwrap_or_else(|| PathBuf::from("/tmp"));
-    base.join(".devprotector").join("quarantine")
+    base.join(".argus").join("quarantine")
 }
 
 fn index_path() -> PathBuf {

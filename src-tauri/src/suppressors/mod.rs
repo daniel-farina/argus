@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Pipeline of Suppressors that run after all Detectors have produced
 //! raw hits. Each suppressor can drop or downgrade hits based on broader
 //! file context (is this a .d.ts typings file? is this inside a known-good

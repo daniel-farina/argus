@@ -26,7 +26,7 @@ impl Config {
 
 pub fn config_dir() -> PathBuf {
     let base = dirs::home_dir().unwrap_or_else(|| PathBuf::from("/tmp"));
-    base.join(".devprotector")
+    base.join(".argus")
 }
 
 pub fn config_path() -> PathBuf {

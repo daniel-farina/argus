@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Flags high-Shannon-entropy blobs embedded inside otherwise readable code.
 //! Minified bundles are naturally high-entropy per-character but repeat
 //! patterns; a single giant quoted base64 string with entropy > 5.0 and

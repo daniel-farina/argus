@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Minified bundles (any line longer than 500 chars) get code-pattern
 //! rules demoted unless at least two independent rules fire on the same
 //! file. Bundlers inline lots of third-party code and the patterns we

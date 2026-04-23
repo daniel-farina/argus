@@ -107,8 +107,8 @@ fn add_folder(
 }
 
 /// Kick off a background walk of `path`. Returns immediately; file-level
-/// progress reaches the UI through `devprotector://activity` events and
-/// a final `devprotector://scan-complete` event.
+/// progress reaches the UI through `argus://activity` events and
+/// a final `argus://scan-complete` event.
 #[tauri::command]
 fn scan_folder_now(
     path: String,
@@ -169,7 +169,7 @@ fn quarantine_path(
             }
         });
     let entry = quarantine::quarantine(&det).map_err(|e| e.to_string())?;
-    let _ = app.emit("devprotector://quarantine", entry.clone());
+    let _ = app.emit("argus://quarantine", entry.clone());
 
     // Also log an activity row so the user sees the action land in the feed.
     let evt = ActivityEvent {
@@ -181,7 +181,7 @@ fn quarantine_path(
         note: Some("manual quarantine".into()),
     };
     state.push_activity(evt.clone());
-    let _ = app.emit("devprotector://activity", evt);
+    let _ = app.emit("argus://activity", evt);
     Ok(entry)
 }
 
@@ -394,7 +394,7 @@ struct PanicStatus {
 #[tauri::command]
 async fn panic_status() -> PanicStatus {
     let out = tokio::process::Command::new("pfctl")
-        .args(["-a", "devprotector", "-s", "rules"])
+        .args(["-a", "argus", "-s", "rules"])
         .output()
         .await;
     let paused = out
@@ -406,9 +406,9 @@ async fn panic_status() -> PanicStatus {
 #[tauri::command]
 async fn panic_pause() -> Result<(), String> {
     // Load a pf anchor that drops all outbound; admin prompt via osascript.
-    let shell = "echo 'block drop out all' | pfctl -a devprotector -f - 2>/dev/null && pfctl -E 2>/dev/null; echo ok";
+    let shell = "echo 'block drop out all' | pfctl -a argus -f - 2>/dev/null && pfctl -E 2>/dev/null; echo ok";
     let apple_script = format!(
-        r#"do shell script "{}" with administrator privileges with prompt "DevProtector needs admin to pause outbound network.""#,
+        r#"do shell script "{}" with administrator privileges with prompt "Argus needs admin to pause outbound network.""#,
         shell.replace('"', "\\\"")
     );
     let out = tokio::process::Command::new("osascript")
@@ -424,9 +424,9 @@ async fn panic_pause() -> Result<(), String> {
 
 #[tauri::command]
 async fn panic_resume() -> Result<(), String> {
-    let shell = "pfctl -a devprotector -F all 2>/dev/null; echo ok";
+    let shell = "pfctl -a argus -F all 2>/dev/null; echo ok";
     let apple_script = format!(
-        r#"do shell script "{}" with administrator privileges with prompt "DevProtector - resume network.""#,
+        r#"do shell script "{}" with administrator privileges with prompt "Argus - resume network.""#,
         shell.replace('"', "\\\"")
     );
     let out = tokio::process::Command::new("osascript")

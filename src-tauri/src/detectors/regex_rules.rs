@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Runs the declarative regex rule set from `crate::rules::RULES`.
 
 use crate::detectors::{Detector, ScanContext};

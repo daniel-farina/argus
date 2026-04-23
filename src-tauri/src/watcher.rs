@@ -99,7 +99,7 @@ pub fn handle_file(app: &AppHandle, state: &Arc<AppState>, path: &Path) {
     let path_str = path.display().to_string();
     state.set_current_scan(Some(path_str.clone()));
     let _ = app.emit(
-        "devprotector://scan-start",
+        "argus://scan-start",
         serde_json::json!({ "path": path_str }),
     );
 
@@ -128,7 +128,7 @@ pub fn handle_file(app: &AppHandle, state: &Arc<AppState>, path: &Path) {
             note: Some("clean".into()),
         };
         state.push_activity(evt.clone());
-        let _ = app.emit("devprotector://activity", evt);
+        let _ = app.emit("argus://activity", evt);
     }
 }
 
@@ -153,7 +153,7 @@ fn react(app: &AppHandle, state: &Arc<AppState>, mut det: Detection) {
             Ok(entry) => {
                 action = "quarantined".into();
                 quarantined = true;
-                let _ = app.emit("devprotector://quarantine", entry);
+                let _ = app.emit("argus://quarantine", entry);
             }
             Err(e) => tracing::error!("quarantine failed: {e}"),
         }
@@ -178,8 +178,8 @@ fn react(app: &AppHandle, state: &Arc<AppState>, mut det: Detection) {
         )),
     };
     state.push_activity(evt.clone());
-    let _ = app.emit("devprotector://activity", evt);
-    let _ = app.emit("devprotector://detection", det);
+    let _ = app.emit("argus://activity", evt);
+    let _ = app.emit("argus://detection", det);
 }
 
 pub fn add_path(state: &AppState, path: &Path) -> Result<(), String> {
@@ -217,7 +217,7 @@ pub fn force_check(app: &AppHandle, state: &Arc<AppState>, path: &Path) -> Optio
 pub fn scan_tree(app: &AppHandle, state: &Arc<AppState>, root: &Path) -> usize {
     let skip = [
         "node_modules", ".git", "target", "dist", "build", ".next",
-        ".cache", ".devprotector",
+        ".cache", ".argus",
     ];
     let walker = walkdir::WalkDir::new(root).follow_links(false).into_iter();
     let mut count = 0usize;
@@ -245,7 +245,7 @@ pub fn scan_tree(app: &AppHandle, state: &Arc<AppState>, root: &Path) -> usize {
     }
     state.set_watched_count(state.watch.lock().watched.len());
     let _ = app.emit(
-        "devprotector://scan-complete",
+        "argus://scan-complete",
         serde_json::json!({ "root": root.display().to_string(), "count": count }),
     );
     count

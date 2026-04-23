@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! TypeScript .d.ts declaration files contain type definitions only.
 //! They mention identifiers like `eval`, `Buffer`, etc. but do not run
 //! any code. Drop all regex code-pattern hits on declaration files.

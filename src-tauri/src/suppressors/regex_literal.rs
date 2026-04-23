@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Drops regex-rule hits where the match falls inside a JS regex literal
 //! (`/eval\(atob/`) or inside a backtick-quoted string that is clearly
 //! a pattern (e.g. RegExp source). ESLint rules, linters, parsers,

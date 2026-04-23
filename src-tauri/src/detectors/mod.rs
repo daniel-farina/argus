@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Modular detection pipeline. Each Detector inspects a ScanContext and
 //! returns zero or more RuleHits. The runner concatenates results, then
 //! a chain of Suppressors can downgrade or drop hits based on file-level

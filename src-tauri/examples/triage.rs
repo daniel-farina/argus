@@ -1,9 +1,9 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Scans every repo under ~/code/test-repos and reports High+ findings
 //! grouped by (rule_id, matched) for quick FP triage.
 
-use devprotector_lib::rules::Severity;
-use devprotector_lib::scanner::{scan_directory, severity_rank};
+use argus_lib::rules::Severity;
+use argus_lib::scanner::{scan_directory, severity_rank};
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 

@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! When a file lives inside `node_modules/<pkg>/...` where `<pkg>` is on
 //! a curated allowlist of ultra-popular OSS packages, demote code-pattern
 //! hits by one severity level. The allowlist is intentionally short and

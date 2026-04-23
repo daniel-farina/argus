@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Calibrates JS012 exfil-host hits based on the matched URL:
 //!   - localhost / RFC1918 private address -> drop entirely
 //!     (tests, dev servers, docs constantly reference 127.0.0.1 / 10.x / ...)

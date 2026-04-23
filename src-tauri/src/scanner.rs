@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! File-level scan entry point. Builds a ScanContext, runs the detector
 //! pipeline, then the suppressor pipeline, and packages the result as a
 //! Detection.
@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 
 pub const MAX_SCAN_SIZE: u64 = 8 * 1024 * 1024;
 pub const BUNDLE_LINE_THRESHOLD: usize = 500;
-pub const SELF_EXCLUDE_MARKER: &str = "DEVPROTECTOR_SELF_EXCLUDE";
+pub const SELF_EXCLUDE_MARKER: &str = "ARGUS_SELF_EXCLUDE";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Detection {
@@ -63,9 +63,7 @@ pub fn severity_rank(s: Severity) -> u8 {
 
 pub fn is_path_excluded(path: &Path) -> bool {
     let s = path.to_string_lossy();
-    s.contains("/.devprotector/")
-        || s.contains("/DevProtector/src-tauri/src/")
-        || s.contains("/devprotector/src-tauri/src/")
+    s.contains("/.argus/") || s.contains("/argus/src-tauri/src/")
 }
 
 pub fn scan_file(path: &Path) -> anyhow::Result<Option<Detection>> {
@@ -206,7 +204,7 @@ pub fn scan_directory(root: &Path) -> Vec<Detection> {
     let mut out = Vec::new();
     let skip = [
         "node_modules", ".git", "target", "dist", "build", ".next",
-        ".cache", ".devprotector",
+        ".cache", ".argus",
     ];
     let walker = walkdir::WalkDir::new(root).follow_links(false).into_iter();
     for entry in walker.filter_entry(|e| {

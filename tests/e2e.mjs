@@ -1,4 +1,4 @@
-// End-to-end test for DevProtector driven through tauri-wd + WebDriver.
+// End-to-end test for Argus driven through tauri-wd + WebDriver.
 // Launches the real Tauri app, adds ~/code/bad as a monitored folder, then
 // triggers a scan and asserts that malicious files were detected and
 // quarantined.
@@ -12,8 +12,8 @@ const HOME = os.homedir();
 const BAD_DIR = path.join(HOME, "code", "bad");
 const WD_SERVER = process.env.TAURI_WD_URL || "http://127.0.0.1:4444";
 const BINARY =
-  process.env.DEVPROTECTOR_BIN ||
-  path.resolve("src-tauri/target/debug/devprotector");
+  process.env.ARGUS_BIN ||
+  path.resolve("src-tauri/target/debug/argus");
 
 function log(...args) {
   console.log("[e2e]", ...args);
@@ -52,7 +52,7 @@ async function unwrap(res, label) {
 }
 
 async function resetState() {
-  const base = path.join(HOME, ".devprotector");
+  const base = path.join(HOME, ".argus");
   await fs.rm(base, { recursive: true, force: true }).catch(() => {});
   await fs.mkdir(base, { recursive: true });
   // Rehydrate the ~/code/bad fixture in case a prior run quarantined it.
@@ -94,7 +94,7 @@ const phish = \`osascript -e 'display dialog "macOS needs your password" default
 }
 
 async function main() {
-  log("resetting DevProtector state");
+  log("resetting Argus state");
   await resetState();
 
   log("fixture path:", BAD_DIR);

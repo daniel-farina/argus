@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Flags package.json dependencies whose name is a distance-1 typo
 //! of a popular package name. Typical supply-chain trick.
 

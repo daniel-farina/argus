@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Shared detection primitives: the severity ladder, a single hit record
 //! produced by every detector, the regex rule set, and curated package
 //! name lists used by detectors and suppressors.

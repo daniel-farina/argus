@@ -1,4 +1,4 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Structured analysis of package.json. Differentiates benign install
 //! hooks (husky, node-gyp rebuild, simple `node ./bin/...`) from hostile
 //! ones (curl | bash, node -e "fetch(...)", base64 eval).

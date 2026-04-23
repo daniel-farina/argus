@@ -1,10 +1,10 @@
-// DEVPROTECTOR_SELF_EXCLUDE
+// ARGUS_SELF_EXCLUDE
 //! Quick benchmark: scan every cloned repo under ~/code/test-repos and
 //! report detection counts per severity. Fast because it uses
 //! scan_directory's default skip list (node_modules, dist, build).
 
-use devprotector_lib::rules::Severity;
-use devprotector_lib::scanner::{scan_directory, severity_rank};
+use argus_lib::rules::Severity;
+use argus_lib::scanner::{scan_directory, severity_rank};
 use std::path::PathBuf;
 use std::time::Instant;
 

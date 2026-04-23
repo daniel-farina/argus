@@ -1,4 +1,4 @@
-//! Benchmark suite for DevProtector's detection pipeline.
+//! Benchmark suite for Argus's detection pipeline.
 //!
 //! Two halves:
 //!   1. Malicious fixture verification - every fixture under ~/code/bad-fixtures
@@ -8,8 +8,8 @@
 
 use std::path::PathBuf;
 
-use devprotector_lib::rules::{RuleHit, Severity};
-use devprotector_lib::scanner::{scan_directory, scan_file, severity_rank};
+use argus_lib::rules::{RuleHit, Severity};
+use argus_lib::scanner::{scan_directory, scan_file, severity_rank};
 
 fn fixtures_root() -> PathBuf {
     dirs::home_dir().unwrap().join("code").join("bad-fixtures")
@@ -174,7 +174,7 @@ fn every_fixture_dir_has_at_least_one_detection() {
 
 #[test]
 fn clean_first_party_code_is_quiet() {
-    let tmp = std::env::temp_dir().join("devprotector-clean-app.js");
+    let tmp = std::env::temp_dir().join("argus-clean-app.js");
     std::fs::write(
         &tmp,
         "export function hello(name) { return `Hello, ${name}!`; }\n\
@@ -214,7 +214,7 @@ fn eslint_rule_file_is_suppressed_as_known_good() {
 
 #[test]
 fn declaration_file_is_suppressed() {
-    let tmp = std::env::temp_dir().join("devprotector-types.d.ts");
+    let tmp = std::env::temp_dir().join("argus-types.d.ts");
     std::fs::write(
         &tmp,
         "export declare function eval(code: string): any;\n\

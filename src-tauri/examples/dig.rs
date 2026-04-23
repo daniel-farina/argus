@@ -1,6 +1,6 @@
-// DEVPROTECTOR_SELF_EXCLUDE
-use devprotector_lib::rules::Severity;
-use devprotector_lib::scanner::{scan_directory, severity_rank};
+// ARGUS_SELF_EXCLUDE
+use argus_lib::rules::Severity;
+use argus_lib::scanner::{scan_directory, severity_rank};
 use std::path::PathBuf;
 
 fn main() {

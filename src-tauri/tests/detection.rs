@@ -1,8 +1,8 @@
 use std::fs;
 use std::path::PathBuf;
 
-use devprotector_lib::rules::Severity;
-use devprotector_lib::scanner::{scan_directory, scan_file, top_severity};
+use argus_lib::rules::Severity;
+use argus_lib::scanner::{scan_directory, scan_file, top_severity};
 
 fn fixture_dir() -> PathBuf {
     dirs::home_dir().unwrap().join("code").join("bad")
@@ -73,7 +73,7 @@ fn directory_scan_flags_multiple_files() {
 
 #[test]
 fn clean_file_is_not_flagged() {
-    let tmp = std::env::temp_dir().join("devprotector-clean.js");
+    let tmp = std::env::temp_dir().join("argus-clean.js");
     fs::write(&tmp, "export function greet() { return 'hello'; }\n").unwrap();
     let det = scan_file(&tmp).unwrap();
     assert!(det.is_none(), "clean file should not produce a detection");
@@ -82,7 +82,7 @@ fn clean_file_is_not_flagged() {
 
 #[test]
 fn clean_package_json_is_not_flagged() {
-    let tmp = std::env::temp_dir().join("devprotector-clean-package.json");
+    let tmp = std::env::temp_dir().join("argus-clean-package.json");
     fs::write(
         &tmp,
         r#"{"name":"x","version":"1.0.0","scripts":{"build":"tsc"},"dependencies":{"react":"^18"}}"#,
@@ -95,7 +95,7 @@ fn clean_package_json_is_not_flagged() {
 
 #[test]
 fn detects_host_indicators_in_json_files() {
-    let tmp = std::env::temp_dir().join("devprotector-exfil.json");
+    let tmp = std::env::temp_dir().join("argus-exfil.json");
     fs::write(
         &tmp,
         r#"{"remote":"https://requestbin.com/r/abcd","note":"legit","raw_ip":"http://1.2.3.4/exfil"}"#,

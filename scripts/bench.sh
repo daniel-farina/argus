@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# DevProtector benchmark runner.
+# Argus benchmark runner.
 # - Runs all fixture assertions (malicious samples must be caught)
 # - Runs the OSS noise budget against ~/code/test-repos/{express,chalk,lodash}
 # - Prints a compact summary

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the complete DevProtector test suite:
+# Runs the complete Argus test suite:
 #   1. Rust unit + integration tests
 #   2. Tauri WebDriver end-to-end (via tauri-wd + selenium-webdriver)
 #
@@ -26,7 +26,7 @@ ok  "rust tests"
 
 say "building debug binary for WebDriver e2e"
 (cd src-tauri && cargo build)
-BIN="$ROOT/src-tauri/target/debug/devprotector"
+BIN="$ROOT/src-tauri/target/debug/argus"
 if [ ! -x "$BIN" ]; then
   err "binary not built at $BIN"
   exit 1
@@ -58,7 +58,7 @@ for i in $(seq 1 40); do
 done
 
 say "running e2e via selenium-webdriver"
-TAURI_WD_URL="http://127.0.0.1:4455" DEVPROTECTOR_BIN="$BIN" \
+TAURI_WD_URL="http://127.0.0.1:4455" ARGUS_BIN="$BIN" \
   node tests/e2e.mjs
 
 ok "all tests passed"

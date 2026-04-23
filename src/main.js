@@ -829,22 +829,22 @@ async function bootstrap() {
     rScheduled = true;
     setTimeout(async () => { rScheduled = false; try { await refresh(); } catch {} }, 300);
   };
-  await listen("devprotector://detection", scheduleRefresh);
-  await listen("devprotector://quarantine", scheduleRefresh);
-  await listen("devprotector://activity", (evt) => {
+  await listen("argus://detection", scheduleRefresh);
+  await listen("argus://quarantine", scheduleRefresh);
+  await listen("argus://activity", (evt) => {
     if (evt && evt.payload) {
       state.activity = [evt.payload, ...state.activity].slice(0, 80);
       if (currentRoute() === "activity") renderActivity();
       if (currentRoute() === "overview") renderOverview();
     }
   });
-  await listen("devprotector://scan-start", (evt) => {
+  await listen("argus://scan-start", (evt) => {
     if (!state.stats) state.stats = {};
     state.stats.current_scan = evt.payload && evt.payload.path;
     if (currentRoute() === "overview") renderOverview();
     renderBottombar();
   });
-  await listen("devprotector://scan-complete", () => {
+  await listen("argus://scan-complete", () => {
     if (state.stats) state.stats.current_scan = null;
     renderBottombar();
     scheduleRefresh();

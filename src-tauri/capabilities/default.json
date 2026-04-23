@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default capabilities for DevProtector",
+  "description": "Default capabilities for Argus",
   "windows": ["main"],
   "permissions": [
     "core:default",
