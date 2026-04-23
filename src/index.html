@@ -221,9 +221,24 @@
               <span class="muted">- SIGKILL any process executing a detected file</span>
             </span>
           </label>
+          <label class="toggle">
+            <input type="checkbox" id="tglClaude" />
+            <span>Auto-triage Medium+ detections with Claude
+              <span class="muted">- runs `claude --print` on each new detection; if verdict is "benign" at medium/high confidence, the file+rule is auto-dismissed</span>
+            </span>
+          </label>
           <div class="muted" style="margin-top:12px">
             Start in detect-only mode. Flip on auto-quarantine once you trust the rules for your projects.
           </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>Dismissed detections</h3>
+            <span class="counter" id="dismissCount">0</span>
+          </div>
+          <div class="muted" style="margin-bottom:8px">Patterns you (or Claude, when auto-triage is on) marked as false positives. These won't re-alert for the same file + rule.</div>
+          <div class="list" id="dismissList"><div class="muted">Nothing dismissed yet.</div></div>
         </div>
 
         <div class="card">
