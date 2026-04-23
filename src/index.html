@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevProtector</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="side-brand">
+      <div class="brand-badge">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M12 2 4 5v7c0 5 3.5 9 8 10 4.5-1 8-5 8-10V5l-8-3Z" fill="currentColor"/>
+          <path d="m9 12 2 2 4-5" fill="none" stroke="#0a0b10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">DevProtector</div>
+        <div class="brand-sub" id="versionTag">-</div>
+      </div>
+    </div>
+
+    <nav class="side-nav" id="sideNav">
+      <a href="#/overview" data-route="overview">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M3 12 12 4l9 8v8a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-8Z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Overview</span>
+      </a>
+      <a href="#/folders" data-route="folders">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Folders</span>
+        <span class="pill" id="navFolders"></span>
+      </a>
+      <a href="#/detections" data-route="detections">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M12 2 4 5v7c0 5 3.5 9 8 10 4.5-1 8-5 8-10V5l-8-3Z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Detections</span>
+        <span class="pill" id="navDetections"></span>
+      </a>
+      <a href="#/quarantine" data-route="quarantine">
+        <svg viewBox="0 0 24 24" class="ic"><rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4v16M16 4v16" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Quarantine</span>
+        <span class="pill" id="navQuarantine"></span>
+      </a>
+      <a href="#/activity" data-route="activity">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M3 12h4l3-8 4 16 3-8h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span>Activity</span>
+      </a>
+      <a href="#/processes" data-route="processes">
+        <svg viewBox="0 0 24 24" class="ic"><rect x="4" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Processes</span>
+      </a>
+      <a href="#/network" data-route="network">
+        <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Network</span>
+      </a>
+      <a href="#/settings" data-route="settings">
+        <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="side-foot">
+      <div class="status-mini" id="statusPill">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">initialising</span>
+      </div>
+      <div class="mode-mini" id="modePill">-</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="content-head">
+      <div class="head-title">
+        <h1 id="routeTitle">Overview</h1>
+        <p class="head-sub" id="routeSub">Protection status and recent activity</p>
+      </div>
+      <div class="head-actions" id="headActions">
+        <button id="panicBtn" class="btn panic" title="Drop all outbound TCP via pfctl (needs admin)">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 2 2 22h20L12 2Z M12 9v6 M12 17v.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="panicLabel">Panic: pause network</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Overview -->
+      <section class="route" data-route="overview">
+        <div class="stat-grid">
+          <div class="stat">
+            <div class="stat-label">Files scanned</div>
+            <div class="stat-value" id="ovFiles">0</div>
+            <div class="stat-foot" id="ovFilesFoot">since launch</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Detections</div>
+            <div class="stat-value danger" id="ovDet">0</div>
+            <div class="stat-foot" id="ovDetFoot">total</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Quarantined</div>
+            <div class="stat-value warn" id="ovQ">0</div>
+            <div class="stat-foot" id="ovQFoot">items</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Watched folders</div>
+            <div class="stat-value" id="ovFolders">0</div>
+            <div class="stat-foot" id="ovFoldersFoot">active</div>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="card">
+            <div class="card-head"><h3>Current scanner</h3></div>
+            <div class="now-scanning" id="ovCurrent">idle</div>
+            <div class="spark" id="ovSpark"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Recent activity</h3><a class="link" href="#/activity">View all</a></div>
+            <div class="mini-list" id="ovActivity"><div class="muted">Waiting for events...</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Latest detections</h3><a class="link" href="#/detections">View all</a></div>
+          <div class="list" id="ovDetections"><div class="muted">Nothing detected yet.</div></div>
+        </div>
+      </section>
+
+      <!-- Folders -->
+      <section class="route" data-route="folders">
+        <div class="card">
+          <div class="card-head">
+            <h3>Monitored folders</h3>
+            <div class="btn-row" style="margin-top:0">
+              <button class="btn" id="scanAllBtn">Scan all</button>
+              <button class="btn primary" id="addFolderBtn">Add folder</button>
+            </div>
+          </div>
+          <ul class="folder-list" id="folderList"></ul>
+          <div class="muted" id="folderEmpty">No folders yet. Add a project root to start live protection.</div>
+        </div>
+      </section>
+
+      <!-- Detections -->
+      <section class="route" data-route="detections">
+        <div class="card">
+          <div class="card-head">
+            <h3>All detections</h3>
+            <div class="btn-row" style="margin-top:0">
+              <span class="counter" id="detCount">0</span>
+              <button class="btn danger" id="clearDetBtn">Clear all</button>
+            </div>
+          </div>
+          <div class="list" id="detections"><div class="muted">Nothing detected yet.</div></div>
+        </div>
+      </section>
+
+      <!-- Quarantine -->
+      <section class="route" data-route="quarantine">
+        <div class="card">
+          <div class="card-head"><h3>Quarantine</h3><span class="counter" id="qCount">0</span></div>
+          <div class="list" id="quarantine"><div class="muted">Quarantine is empty.</div></div>
+        </div>
+      </section>
+
+      <!-- Activity -->
+      <section class="route" data-route="activity">
+        <div class="card">
+          <div class="card-head"><h3>Live activity</h3><span class="counter" id="actCount">0</span></div>
+          <div class="list activity-list" id="activity"><div class="muted">Waiting for file events...</div></div>
+        </div>
+      </section>
+
+      <!-- Processes -->
+      <section class="route" data-route="processes">
+        <div class="card">
+          <div class="card-head">
+            <h3>Dev processes</h3>
+            <div class="btn-row" style="margin-top:0">
+              <label class="toggle tight"><input type="checkbox" id="liveProcs" /><span>Live (10s)</span></label>
+              <button class="btn" id="scanProcsBtn">Scan now</button>
+            </div>
+          </div>
+          <div class="list" id="procList"><div class="muted">No scan run yet.</div></div>
+        </div>
+      </section>
+
+      <!-- Network -->
+      <section class="route" data-route="network">
+        <div class="card">
+          <div class="card-head">
+            <h3>Network connections</h3>
+            <div class="btn-row" style="margin-top:0">
+              <label class="toggle tight"><input type="checkbox" id="liveNet" /><span>Live (15s)</span></label>
+              <button class="btn" id="scanNetBtn">Scan now</button>
+            </div>
+          </div>
+          <div class="list" id="netList"><div class="muted">No scan run yet.</div></div>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section class="route" data-route="settings">
+        <div class="card">
+          <div class="card-head"><h3>Protection mode</h3><span class="counter" id="settingsMode">detect only</span></div>
+          <label class="toggle">
+            <input type="checkbox" id="tglProtection" />
+            <span>Real-time detection
+              <span class="muted">- scan files as they change</span>
+            </span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="tglQuarantine" />
+            <span>Auto-quarantine on detect
+              <span class="muted">- move offending files to ~/.devprotector/quarantine</span>
+            </span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="tglKill" />
+            <span>Auto-kill offending processes
+              <span class="muted">- SIGKILL any process executing a detected file</span>
+            </span>
+          </label>
+          <div class="muted" style="margin-top:12px">
+            Start in detect-only mode. Flip on auto-quarantine once you trust the rules for your projects.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>System</h3></div>
+          <div class="kv" id="sysMeta"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="bottombar" id="bottombar">
+    <div class="bb-item">
+      <div class="bb-label">CPU</div>
+      <div class="bb-bar"><div class="bb-fill" id="bbCpuFill"></div></div>
+      <div class="bb-value" id="bbCpu">-</div>
+    </div>
+    <div class="bb-item">
+      <div class="bb-label">RAM</div>
+      <div class="bb-bar"><div class="bb-fill" id="bbMemFill"></div></div>
+      <div class="bb-value" id="bbMem">-</div>
+    </div>
+    <div class="bb-item">
+      <div class="bb-label">Disk</div>
+      <div class="bb-bar"><div class="bb-fill" id="bbDiskFill"></div></div>
+      <div class="bb-value" id="bbDisk">-</div>
+    </div>
+    <div class="bb-spacer"></div>
+    <div class="bb-text"><span class="bb-label">load</span><span id="bbLoad">-</span></div>
+    <div class="bb-text"><span class="bb-label">uptime</span><span id="bbUptime">-</span></div>
+    <div class="bb-text"><span class="bb-label">watched</span><span id="bbWatched">0</span></div>
+    <div class="bb-text"><span class="bb-label">scans</span><span id="bbScans">0</span></div>
+    <div class="bb-pulse" title="Scanner activity"><span class="pulse idle" id="bbPulse"></span></div>
+  </footer>
+
+  <!-- Modal overlay used by View Source + Ask Claude -->
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h3 id="modalTitle">-</h3>
+          <div class="muted" id="modalSub"></div>
+        </div>
+        <div class="btn-row" style="margin-top:0">
+          <button class="btn" id="modalCopyBtn">Copy</button>
+          <button class="btn" id="modalAskBtn">Ask Claude</button>
+          <button class="btn" id="modalCloseBtn">Close</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <pre class="modal-code" id="modalCode"></pre>
+        <div class="modal-claude" id="modalClaude" hidden>
+          <div class="card-head"><h3>Claude verdict</h3></div>
+          <pre class="modal-code" id="modalClaudeBody"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
